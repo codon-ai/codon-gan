@@ -1,14 +1,14 @@
-export const setupPrompt = (githubToken?: string) => `You are the setup agent for an iterative optimization loop on the repository at /workspace/civet-optimized.
+export const setupPrompt = (githubToken?: string) => `You are the setup agent for an iterative optimization loop on the repository at /workspace/codon.
 
 Your task is to inspect the git repository branches and set up a new development branch for the next revision.
 
-Navigate to /workspace/civet-optimized and execute the following commands in bash:
+Navigate to /workspace/codon and execute the following commands in bash:
 
 \`\`\`bash
-cd /workspace/civet-optimized
+cd /workspace/codon
 git config user.name "Keizou Wang"
 git config user.email "keizouw@proton.me"
-${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/civet-optimized.git\n` : ""}git fetch --all
+${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
 
 # Identify highest finished revision rev<n>
 LATEST_REV=$(git branch -r | grep -E 'origin/rev[0-9]+$' | sed 's/.*origin\/rev//' | sort -n | tail -1)
@@ -29,31 +29,32 @@ git status
 
 Confirm that the new development branch (e.g. rev1a, rev2a) is created, checked out, and pushed to origin.`;
 
-export const optimizePrompt = (githubToken?: string) => `You are the optimization agent in an iterative optimization loop on the repository at /workspace/civet-optimized.
+export const optimizePrompt = (githubToken?: string) => `You are the optimization agent in an iterative optimization loop on the repository at /workspace/codon.
 
-The repository is a fork of Civet's source code. In the setup phase just completed, a new development branch was created and checked out for this iteration. Your goal is to improve the token-efficiency of LLMs generating Civet code, specifically targeting fullstack development applications.
+Codon is a language based on J syntax which transpiles to Javascript. In the setup phase just completed, a new development branch was created and checked out for this iteration. Your goal is to improve the token-efficiency of LLMs generating Codon code, specifically targeting fullstack development applications.
 
 ### Tasks & Steps:
 
 1. **Verify the Active Branch**:
-   - Navigate to \`/workspace/civet-optimized\`.
+   - Navigate to \`/workspace/codon\`.
    - Configure git credentials and remote:
      \`\`\`bash
      git config user.name "Keizou Wang"
      git config user.email "keizouw@proton.me"
-${githubToken ? `     git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/civet-optimized.git\n` : ""}     \`\`\`
+${githubToken ? `     git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}     \`\`\`
    - Check the currently checked-out git branch by running \`git branch --show-current\`.
    - This active branch follows the pattern \`rev<number>a\` (e.g., \`rev1a\`, \`rev2a\`, \`rev3a\`).
    - You must carry out all your work on this active branch.
 
 2. **Review Existing Optimizations and History**:
-   - Review \`OPTIMIZATIONS.md\` to familiarize yourself with all existing syntax optimizations and modifications currently implemented over standard Civet.
+   - Review \`OPTIMIZATIONS.md\` to familiarize yourself with all existing syntax optimizations and modifications in Codon currently implemented over standard J.
    - Review \`ATTEMPTS.md\` to understand both successful and unsuccessful optimization attempts from previous revisions and avoid repeating past ideas.
 
 3. **Brainstorm a Focused Syntax Revision**:
-   - Brainstorm one focused revision to Civet's syntax to improve the token-efficiency of LLMs generating code in Civet, with a strong focus on fullstack development (e.g., JSX/component patterns, API routes, data fetching, imports/exports, state management, async operations).
-   - Ensure the syntax is concise, unambiguous, and cleanly implementable within the Civet compiler.
-   - The scope of the revision should be small and focused. It should take less than 10 minutes to code and only affect one small aspect of Civet's syntax.
+   - Brainstorm one focused revision to Codon's current syntax to improve the token-efficiency of LLMs generating code in Codon, with a strong focus on AI fullstack development (e.g., JSX/component patterns, API routes, data fetching, imports/exports, state management, async operations).
+   - Ensure the syntax is concise, unambiguous, and cleanly implementable within the Codon to Javascript transpiler.
+   - The scope of your revision should be small and focused. It should take less than 10 minutes to code and only affect one small aspect of Codon's syntax.
+   - The resulting syntax does not necessarily have to be human readable. Your goal should be to make Codon maximally efficient for LLM token usage.
 
 4. **Document the Attempt in ATTEMPTS.md & Intermediate Commit**:
    - Extract the revision identifier from your current branch name:
@@ -71,13 +72,13 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
      \`\`\`
 
 5. **Plan and Implement the Revision**:
-   - Detail affected compiler components (lexer/scanner, parser rules, AST transformations, code generator, and tests).
-   - Carry out the implementation of the syntax revision in the Civet codebase.
+   - Detail affected transpiler components (lexer/scanner, parser rules, AST transformations, code generator, and tests).
+   - Carry out the implementation of the syntax revision in the Codon codebase.
    - Ensure the compiler builds and run tests if feasible to verify correctness without regressing existing syntax.
 
 6. **Update OPTIMIZATIONS.md**:
    - Edit \`OPTIMIZATIONS.md\` with detailed documentation on how the newly implemented syntax functions.
-   - Include comparison examples showing the syntax changes and token savings compared to standard Civet.
+   - Include comparison examples showing the syntax changes and token savings compared to standard J.
 
 7. **CRITICAL REQUIREMENT - Final Commit and Push**:
    - Regardless of whether the tests passed, failed, or are incomplete, you MUST stage all changes, commit, and push before ending your turn:
@@ -90,23 +91,23 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
      \`\`\`
    - Confirm with \`git status\` that the working tree is clean and all commits have been pushed.`;
 
-export const benchmarkPrompt = `You are the benchmarking agent for the Civet optimization project at /workspace/civet-optimized.
+export const benchmarkPrompt = `You are the benchmarking agent for the Codon optimization project at /workspace/codon.
 
-Your task is to implement every benchmark prompt located in \`/workspace/civet-optimized/benchmark/prompts/\` into its corresponding Civet source file in \`/workspace/civet-optimized/benchmark/civet/\`.
+Your task is to implement every benchmark prompt located in \`/workspace/codon/benchmark/prompts/\` into its corresponding Codon source file in \`/workspace/codon/benchmark/codon/\`.
 
 ### CRITICAL INSTRUCTION ON TOKEN CONSUMPTION:
-The token-efficiency of the modified Civet language is being measured directly by the tokens you output while writing these benchmark programs.
+The token-efficiency of this Codon revision is being measured directly by the tokens you output while writing these benchmark programs.
 - **DO NOT** write explanations, commentaries, reviews, intros, or summaries about the language or code.
 - **DO NOT** discuss the syntax, features, or token savings.
 - Strictly perform the benchmarks with zero conversational filler. Output only what is necessary to inspect prompts, write the implementation files, and have train of thought.
 
 ### Steps:
 1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
-2. Discover all prompt files in \`/workspace/civet-optimized/benchmark/prompts/\`.
-3. For every prompt file, write the complete implementation in the matching \`.civet\` file in \`/workspace/civet-optimized/benchmark/civet/\` utilizing the modified Civet syntax features for maximum conciseness.
+2. Discover all prompt files in \`/workspace/codon/benchmark/prompts/\`.
+3. For every prompt file, write the complete implementation in the matching \`.cdn\` file in \`/workspace/codon/benchmark/codon/\` utilizing the modified Civet syntax features for maximum conciseness.
 4. Ensure all benchmark programs are implemented directly.`;
 
-export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/civet-optimized.
+export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/codon.
 
 The benchmark phase just concluded. The benchmark agent consumed **${tokens !== undefined ? tokens : "<tokens>"}** output tokens implementing the benchmarks.
 
@@ -114,7 +115,7 @@ Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine wheth
 
 ### Standardized Format for ATTEMPTS.md:
 1. Identify the current revision from the active branch (\`rev1a\`, \`rev2a\`, etc.).
-2. Locate the section for the current revision at the top of \`/workspace/civet-optimized/ATTEMPTS.md\`.
+2. Locate the section for the current revision at the top of \`/workspace/codon/ATTEMPTS.md\`.
 3. Find the last prior successful attempt in \`ATTEMPTS.md\` (the most recent section with \`(successful)\` in its header) and read its recorded \`Tokens:\` value.
    - If there are no prior successful attempts recorded (e.g., this is Revision 1a), treat this revision as successful.
 4. Compare the current tokens (**${tokens !== undefined ? tokens : "<tokens>"}**) against the last successful attempt's tokens:
@@ -133,10 +134,10 @@ Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine wheth
 Once \`ATTEMPTS.md\` has been updated and saved, execute the following bash script to finalize and push both the development branch and the finished revision branch:
 
 \`\`\`bash
-cd /workspace/civet-optimized
+cd /workspace/codon
 git config user.name "Keizou Wang"
 git config user.email "keizouw@proton.me"
-${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/civet-optimized.git\n` : ""}git fetch --all
+${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
 
 CURRENT_BRANCH=$(git branch --show-current)
 NUM="\${CURRENT_BRANCH#rev}"

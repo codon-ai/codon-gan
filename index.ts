@@ -135,8 +135,8 @@ for (let i = 1; true; i++) {
                 sources: [
                     {
                         type: "repository",
-                        source: "https://github.com/codon-ai/civet-optimized",
-                        target: "/workspace/civet-optimized",
+                        source: "https://github.com/codon-ai/codon",
+                        target: "/workspace/codon",
                     },
                 ],
             },
