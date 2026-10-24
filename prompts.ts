@@ -17,7 +17,7 @@ Your task is to inspect the git repository branches and set up a new development
 6. Confirm the working tree is clean and that \`rev<n+1>a\` is the active branch.
 7. Print a confirmation stating the latest revision found (\`rev<n>\`) and the newly created branch (\`rev<n+1>a\`).`;
 
-export const brainstormPrompt = ``;
+export const optimizePrompt = ``;
 
 export const benchmarkPrompt = ``;
 
