@@ -14,6 +14,9 @@ for (let i = 1; true; i++) {
         input: setupPrompt,
         environment: {
             type: "remote",
+            env: {
+                GITHUB_TOKEN: process.env.GITHUB_TOKEN ?? "",
+            },
             sources: [
                 {
                     type: "repository",

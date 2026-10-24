@@ -58,11 +58,23 @@ The repository is a fork of Civet's source code. In the setup phase just complet
    - Edit \`OPTIMIZATIONS.md\` with detailed documentation on how the newly implemented syntax functions.
    - Include comparison examples showing the syntax changes and token savings compared to standard Civet.
 
-8. **Commit Revision to Codebase**:
+8. **Commit and Push Revision to Codebase**:
+   - Configure git identity if not already set:
+     \`\`\`bash
+     git config user.name "Keizou Wang"
+     git config user.email "keizouw@proton.me"
+     \`\`\`
    - Stage and commit all changes across the codebase (compiler modifications, tests, OPTIMIZATIONS.md, and ATTEMPTS.md):
      \`\`\`bash
      git add -A
      git commit -m "Implement Revision <number>a"
+     \`\`\`
+   - Configure authenticated remote and push \`rev<number>a\` to GitHub:
+     \`\`\`bash
+     if [ -n "$GITHUB_TOKEN" ]; then
+       git remote set-url origin https://x-access-token:\${GITHUB_TOKEN}@github.com/codon-ai/civet-optimized.git
+       git push -u origin rev<number>a
+     fi
      \`\`\`
    - Verify with \`git status\` that the working tree is clean and ready for benchmarking.`;
 
@@ -111,6 +123,8 @@ Navigate to \`/workspace/civet-optimized\` and execute the following standardize
 
 1. **Commit All Changes on the current development branch (\`rev<n>a\`):**
    \`\`\`bash
+   git config user.name "Keizou Wang"
+   git config user.email "keizouw@proton.me"
    git add -A
    git commit -m "Record revision <n>a results (${tokens !== undefined ? tokens : "<tokens>"} tokens)"
    \`\`\`
@@ -135,7 +149,16 @@ Navigate to \`/workspace/civet-optimized\` and execute the following standardize
      git commit -m "Update ATTEMPTS.md with unsuccessful revision <n>a"
      \`\`\`
 
-3. **Verification:**
+3. **Push Branches to GitHub:**
+   \`\`\`bash
+   if [ -n "$GITHUB_TOKEN" ]; then
+     git remote set-url origin https://x-access-token:\${GITHUB_TOKEN}@github.com/codon-ai/civet-optimized.git
+     git push -u origin rev<n>a
+     git push -u origin rev<n>
+   fi
+   \`\`\`
+
+4. **Verification:**
    - Confirm \`git branch --show-current\` outputs \`rev<n>\`.
    - Ensure the working tree is clean (\`git status\`).
    - Print a clear summary stating the revision outcome (successful or unsuccessful), token comparison details, and the active branch.`;
