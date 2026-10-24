@@ -85,6 +85,10 @@ async function runStep(stepIndex: number, createParams: any) {
         throw new Error(`Interaction for ${stepNames[stepIndex]} did not complete successfully.`);
     }
 
+    if (completedInteraction.status === "failed") {
+        throw new Error(`Interaction for ${stepNames[stepIndex]} failed: ${JSON.stringify(completedInteraction.errors || completedInteraction.output_text)}`);
+    }
+
     if (!completedInteraction.usage && lastUsage) {
         completedInteraction.usage = lastUsage;
     }
@@ -97,6 +101,9 @@ async function runStep(stepIndex: number, createParams: any) {
         const full = await client.interactions.get(completedInteraction.id).catch(() => null);
         if (full?.environment_id) {
             completedInteraction.environment_id = full.environment_id;
+        }
+        if (!completedInteraction.usage && full?.usage) {
+            completedInteraction.usage = full.usage;
         }
     }
 
@@ -149,9 +156,11 @@ for (let i = 1; true; i++) {
             previous_interaction_id: optimize.id,
         });
 
+        const benchmarkTokens = benchmark.usage?.total_output_tokens ?? 0;
+
         let nextSteps = await runStep(3, {
             agent: "antigravity-preview-09-2026",
-            input: nextStepsPrompt(benchmark.usage?.total_output_tokens as number, process.env.GITHUB_TOKEN),
+            input: nextStepsPrompt(benchmarkTokens, process.env.GITHUB_TOKEN),
             environment: setup.environment_id,
             previous_interaction_id: benchmark.id,
         });
