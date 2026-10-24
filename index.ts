@@ -29,8 +29,7 @@ for (let i = 1; true; i++) {
     let optimize = await client.interactions.create({
         agent: "antigravity-preview-09-2026",
         input: optimizePrompt,
-        environment: setup.environment_id,
-        previous_interaction_id: setup.id,
+        environment: setup.environment_id
     });
     spinner.stop(". Optimize (complete)");
     
@@ -39,16 +38,16 @@ for (let i = 1; true; i++) {
         agent: "antigravity-preview-09-2026",
         input: benchmarkPrompt,
         environment: setup.environment_id,
-        previous_interaction_id: optimize.id,
+        previous_interaction_id: optimize.id
     });
     spinner.stop(". Benchmark (complete)");
 
     spinner.start("Next steps (in progress)");
     let nextSteps = await client.interactions.create({
         agent: "antigravity-preview-09-2026",
-        input: nextStepsPrompt,
+        input: nextStepsPrompt(benchmark.usage?.total_output_tokens as number),
         environment: setup.environment_id,
-        previous_interaction_id: benchmark.id,
+        previous_interaction_id: benchmark.id
     });
     spinner.stop(". Next steps (complete)");
 }

@@ -41,10 +41,10 @@ The repository is a fork of Civet's source code. In the setup phase just complet
    - Extract the revision identifier from your current branch name:
      - If the active branch is \`rev1a\`, use \`Revision 1a\`.
      - If the active branch is \`rev2a\`, use \`Revision 2a\`.
-     - In general, for branch \`rev<number>a\`, use \`Revision <number>a\`.
+     - In general, for branch \`rev<number>a\`, use \`Revision <number>\`.
    - Add a new section at the top of \`ATTEMPTS.md\` under the header:
-     \`## Revision <number>a (successful)\`
-     (for example: \`## Revision 2a (successful)\` if you are on \`rev2a\`).
+     \`## Revision <number>\`
+     (for example: \`## Revision 2\` if you are on \`rev2a\`).
    - Describe the revision idea, rationale, target token savings for fullstack applications, and concrete syntax changes.
 
 5. **Plan Implementation**:
@@ -56,8 +56,87 @@ The repository is a fork of Civet's source code. In the setup phase just complet
 
 7. **Update OPTIMIZATIONS.md**:
    - Edit \`OPTIMIZATIONS.md\` with detailed documentation on how the newly implemented syntax functions.
-   - Include comparison examples showing the syntax changes and token savings compared to standard Civet.`;
+   - Include comparison examples showing the syntax changes and token savings compared to standard Civet.
 
-export const benchmarkPrompt = ``;
+8. **Commit Revision to Codebase**:
+   - Stage and commit all changes across the codebase (compiler modifications, tests, OPTIMIZATIONS.md, and ATTEMPTS.md):
+     \`\`\`bash
+     git add -A
+     git commit -m "Implement Revision <number>a"
+     \`\`\`
+   - Verify with \`git status\` that the working tree is clean and ready for benchmarking.`;
 
-export const nextStepsPrompt = ``;
+export const benchmarkPrompt = `You are the benchmarking agent for the Civet optimization project at /workspace/civet-optimized.
+
+Your task is to implement every benchmark prompt located in \`/workspace/civet-optimized/benchmark/prompts/\` into its corresponding Civet source file in \`/workspace/civet-optimized/benchmark/civet/\`.
+
+### CRITICAL INSTRUCTION ON TOKEN CONSUMPTION:
+The token-efficiency of the modified Civet language is being measured directly by the tokens you output while writing these benchmark programs.
+- **DO NOT** write explanations, commentaries, reviews, intros, or summaries about the language or code.
+- **DO NOT** discuss the syntax, features, or token savings.
+- Strictly perform the benchmarks with zero conversational filler. Output only what is necessary to inspect prompts, write the implementation files, and have train of thought.
+
+### Steps:
+1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
+2. Discover all prompt files in \`/workspace/civet-optimized/benchmark/prompts/\`.
+3. For every prompt file, write the complete implementation in the matching \`.civet\` file in \`/workspace/civet-optimized/benchmark/civet/\` utilizing the modified Civet syntax features for maximum conciseness.
+4. Ensure all benchmark programs are implemented directly.`;
+
+export const nextStepsPrompt = (tokens?: number) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/civet-optimized.
+
+The benchmark phase just concluded. The benchmark agent consumed **${tokens !== undefined ? tokens : "<tokens>"}** output tokens implementing the benchmarks.
+
+Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine whether the revision was successful, and finalize the revision branch \`rev<n>\` using a standardized git procedure.
+
+### Standardized Format for ATTEMPTS.md:
+1. Identify the current revision number \`<n>\` from the active branch (\`rev<n>a\`, e.g., if on \`rev2a\`, \`<n>\` is \`2\`).
+2. Locate the section for the current revision at the top of \`/workspace/civet-optimized/ATTEMPTS.md\`.
+3. Find the last prior successful attempt in \`ATTEMPTS.md\` (the most recent section with \`(successful)\` in its header) and read its recorded \`Tokens:\` value.
+   - If there are no prior successful attempts recorded (e.g., this is Revision 1), treat this revision as successful.
+4. Compare the current tokens (**${tokens !== undefined ? tokens : "<tokens>"}**) against the last successful attempt's tokens:
+   - If current tokens < last successful tokens (or if this is the first revision):
+     - The revision is **successful**.
+     - Set the header line to:
+       \`## Revision <n> (successful)\`
+   - If current tokens >= last successful tokens:
+     - The revision is **unsuccessful**.
+     - Set the header line to:
+       \`## Revision <n> (unsuccessful)\`
+5. Immediately under the header line, add the standardized token line:
+   \`- **Tokens:** ${tokens !== undefined ? tokens : "<tokens>"}\`
+
+### Standardized Git Methodology:
+
+Navigate to \`/workspace/civet-optimized\` and execute the following standardized steps:
+
+1. **Commit All Changes on the current development branch (\`rev<n>a\`):**
+   \`\`\`bash
+   git add -A
+   git commit -m "Record revision <n>a results (${tokens !== undefined ? tokens : "<tokens>"} tokens)"
+   \`\`\`
+
+2. **Branch Creation for \`rev<n>\`:**
+
+   - **If SUCCESSFUL:**
+     Create and check out \`rev<n>\` directly from \`rev<n>a\`:
+     \`\`\`bash
+     git checkout -b rev<n>
+     \`\`\`
+
+   - **If UNSUCCESSFUL (Revert code changes while keeping ATTEMPTS.md):**
+     Create and check out \`rev<n>\` branched off \`rev<n-1>\` (or \`main\`/\`master\` if \`n=1\`) to revert the unsuccessful code changes:
+     \`\`\`bash
+     git checkout -b rev<n> rev<n-1>
+     \`\`\`
+     Bring \`ATTEMPTS.md\` from \`rev<n>a\` into \`rev<n>\` and commit it:
+     \`\`\`bash
+     git checkout rev<n>a -- ATTEMPTS.md
+     git add ATTEMPTS.md
+     git commit -m "Update ATTEMPTS.md with unsuccessful revision <n>a"
+     \`\`\`
+
+3. **Verification:**
+   - Confirm \`git branch --show-current\` outputs \`rev<n>\`.
+   - Ensure the working tree is clean (\`git status\`).
+   - Print a clear summary stating the revision outcome (successful or unsuccessful), token comparison details, and the active branch.`;
+
