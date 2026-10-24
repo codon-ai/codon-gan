@@ -7,7 +7,16 @@ for (let i = 1; true; i++) {
     let setup = await client.interactions.create({
         agent: "antigravity-preview-09-2026",
         input: setupPrompt,
-        environment: "remote",
+        environment: {
+            type: "remote",
+            sources: [
+                {
+                    type: "repository",
+                    source: "https://github.com/codon-ai/civet-optimized",
+                    target: "/workspace/civet-optimized"
+                }
+            ]
+        }
     });
     
     let optimize = await client.interactions.create({
