@@ -54,7 +54,7 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
    - Brainstorm one focused revision to Codon's current syntax to improve the token-efficiency of LLMs generating code in Codon, with a strong focus on AI fullstack development (e.g., JSX/component patterns, API routes, data fetching, imports/exports, state management, async operations).
    - Ensure the syntax is concise, unambiguous, and cleanly implementable within the Codon to Javascript transpiler.
    - The scope of your revision should be small and focused. It should take less than 10 minutes to code and only affect one small aspect of Codon's syntax.
-   - The resulting syntax does not necessarily have to be human readable. Your goal should be to make Codon maximally efficient for LLM token usage.
+   - The resulting syntax does not have to be human readable. Your goal should be to make Codon maximally efficient for LLM token usage.
 
 4. **Document the Attempt in ATTEMPTS.md & Intermediate Commit**:
    - Extract the revision identifier from your current branch name:
