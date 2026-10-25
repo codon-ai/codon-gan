@@ -6,7 +6,6 @@ Navigate to /workspace/codon and execute the following commands in bash:
 
 \`\`\`bash
 cd /workspace/codon
-find /workspace/codon/benchmark -type f \( -name "*.js" -o -name "*.jsx" -o -name "*.cdn" \) -delete
 
 git config user.name "Keizou Wang"
 git config user.email "keizouw@proton.me"
@@ -95,7 +94,7 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
 
 export const benchmarkPrompt = `You are the benchmarking agent for the Codon optimization project at /workspace/codon.
 
-Your task is to implement every benchmark prompt located in \`/workspace/codon/benchmark/prompts/\` into its corresponding Codon source file in \`/workspace/codon/benchmark/codon/\`.
+Your task is to implement every single benchmark prompt located in \`/workspace/codon/benchmark/\` into a corresponding Codon source file.
 
 ### CRITICAL INSTRUCTION ON TOKEN CONSUMPTION:
 The token-efficiency of this Codon revision is being measured directly by the tokens you output while writing these benchmark programs.
@@ -105,9 +104,9 @@ The token-efficiency of this Codon revision is being measured directly by the to
 
 ### Steps:
 1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
-2. Discover all prompt files in \`/workspace/codon/benchmark/prompts/\`.
-3. For every prompt file, write the complete implementation in the matching \`.cdn\` file in \`/workspace/codon/benchmark/codon/\` utilizing the modified Codon syntax features for maximum conciseness.
-4. Ensure all benchmark programs are implemented directly.`;
+2. Discover all prompts in the markdown files in \`/workspace/codon/benchmark/\`.
+3. For every prompt file, write the complete implementation in a matching \`.cdn\` file utilizing the modified Codon syntax features for maximum conciseness.
+4. Ensure all benchmark programs are implemented correctly.`;
 
 export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/codon.
 
