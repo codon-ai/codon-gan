@@ -6,6 +6,8 @@ Navigate to /workspace/codon and execute the following commands in bash:
 
 \`\`\`bash
 cd /workspace/codon
+find /workspace/codon/benchmark -type f \( -name "*.js" -o -name "*.jsx" -o -name "*.cdn" \) -delete
+
 git config user.name "Keizou Wang"
 git config user.email "keizouw@proton.me"
 ${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
