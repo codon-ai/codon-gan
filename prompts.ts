@@ -131,11 +131,12 @@ Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine wheth
 5. Immediately under the header line, add the standardized token line:
    \`- **Tokens:** ${tokens !== undefined ? tokens : "<tokens>"}\`
 
-### Final Git Operations:
+### Final Operations:
 Once \`ATTEMPTS.md\` has been updated and saved, execute the following bash script to finalize and push both the development branch and the finished revision branch:
 
 \`\`\`bash
 cd /workspace/codon
+find /workspace/codon/benchmark -type f \( -name "*.cnd" \) -delete
 git config user.name "Keizou Wang"
 git config user.email "keizouw@proton.me"
 ${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
