@@ -52,6 +52,7 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
    - Review \`ATTEMPTS.md\` to understand both successful and unsuccessful optimization attempts from previous revisions and avoid repeating past ideas.
 
 3. **Brainstorm a Focused Syntax Revision**:
+   - Review Codon's documentation in \`/workspace/codon/docs\`
    - Brainstorm one focused revision to Codon's current syntax to improve the token-efficiency of LLMs generating code in Codon, with a strong focus on AI fullstack development (e.g., JSX/component patterns, API routes, data fetching, imports/exports, state management, async operations).
    - Ensure the syntax is concise, unambiguous, and cleanly implementable within the Codon to Javascript transpiler.
    - The scope of your revision should be small and focused. It should take less than 10 minutes to code and only affect one small aspect of Codon's syntax.
@@ -77,8 +78,9 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
    - Carry out the implementation of the syntax revision in the Codon codebase.
    - Ensure the compiler builds and run tests if feasible to verify correctness without regressing existing syntax.
 
-6. **Update OPTIMIZATIONS.md**:
+6. **Update Relevant Markdown**:
    - Edit \`OPTIMIZATIONS.md\` with detailed documentation on how the newly implemented syntax functions.
+   - Edit all documentation in \`/workspace/codon/docs\` affected by the revision. Determine if the addition calls for a new file for documentation and write it.
    - Include comparison examples showing the syntax changes and token savings compared to standard J.
 
 7. **CRITICAL REQUIREMENT - Final Commit and Push**:
@@ -102,11 +104,17 @@ The token-efficiency of this Codon revision is being measured directly by the to
 - **DO NOT** discuss the syntax, features, or token savings.
 - Strictly perform the benchmarks with zero conversational filler. Output only what is necessary to inspect prompts, write the implementation files, and have train of thought.
 
+### STRICT FAST-LOOP EXECUTION RULES:
+- **DO NOT install any packages or dependencies** (e.g., do NOT run npm install, bun add, yarn add, apt, etc.).
+- **DO NOT execute, run, test, or verify the scripts afterwards** (e.g., do NOT run codon, node, bun, or any test runners).
+- The philosophy is simply to write the code. Do not spend time running or verifying.
+- Once you write the implementation file(s), your task is complete. Finish immediately.
+
 ### Steps:
 1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
 2. Discover all prompts in the markdown files in \`/workspace/codon/benchmark/\`.
 3. For every prompt file, write the complete implementation in a matching \`.cdn\` file in \`/workspace/codon/benchmark/\` utilizing the modified Codon syntax features for maximum conciseness.
-4. Ensure all 50 benchmark programs are implemented correctly.`;
+4. Finish immediately without executing, testing, or installing anything.`;
 
 export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/codon.
 

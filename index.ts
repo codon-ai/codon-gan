@@ -111,13 +111,30 @@ async function runStep(stepIndex: number, createParams: any) {
     return completedInteraction;
 }
 
+async function cleanupEnvironments() {
+    try {
+        const existing = await client.environments.list();
+        for (const env of existing.environments ?? []) {
+            await client.environments.delete(env.id).catch(() => {});
+        }
+    } catch {}
+}
+
+process.on("SIGINT", async () => {
+    spinner.stop();
+    console.log("\nInterrupted (SIGINT). Cleaning up remote environments...");
+    await cleanupEnvironments();
+    process.exit(130);
+});
+
+process.on("SIGTERM", async () => {
+    spinner.stop();
+    await cleanupEnvironments();
+    process.exit(143);
+});
+
 // Clean up any stale environments from previous runs
-try {
-    const existing = await client.environments.list();
-    for (const env of existing.environments ?? []) {
-        await client.environments.delete(env.id).catch(() => {});
-    }
-} catch {}
+await cleanupEnvironments();
 
 for (let i = 1; true; i++) {
     console.log(`Iteration ${i}`);
@@ -170,6 +187,8 @@ for (let i = 1; true; i++) {
     } finally {
         if (setup?.environment_id) {
             await client.environments.delete(setup.environment_id).catch(() => {});
+        } else {
+            await cleanupEnvironments();
         }
     }
 }
