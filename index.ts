@@ -156,9 +156,9 @@ for (let i = 1; true; i++) {
             previous_interaction_id: optimize.id,
         });
 
-        const benchmarkTokens = benchmark.usage?.total_output_tokens ?? 0;
+        const benchmarkTokens = benchmark.usage?.total_thought_tokens + benchmark.usage?.total_tool_use_tokens;
 
-        let nextSteps = await runStep(3, {
+        let _nextSteps = await runStep(3, {
             agent: "antigravity-preview-09-2026",
             input: nextStepsPrompt(benchmarkTokens, process.env.GITHUB_TOKEN),
             environment: setup.environment_id,
