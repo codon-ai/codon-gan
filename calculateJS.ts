@@ -15,7 +15,7 @@ The token-efficiency of Javascript is being measured directly by the tokens you 
 ### Steps:
 1. Discover all prompts in the markdown files in \`/workspace/codon/benchmark/\`.
 2. For every prompt file, write the complete implementation in a matching \`.js\` file.
-3. Ensure all benchmark programs are implemented correctly.`;
+3. Ensure all 50 benchmark programs are implemented correctly.`;
 
 let client = new GoogleGenAI({});
 let response = await client.interactions.create({
