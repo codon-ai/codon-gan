@@ -112,8 +112,8 @@ The token-efficiency of this Codon revision is being measured directly by the to
 
 ### Steps:
 1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
-2. Discover all prompts in the markdown files in \`/workspace/codon/benchmark/\`.
-3. For every prompt file, write the complete implementation in a matching \`.cdn\` file in \`/workspace/codon/benchmark/\` utilizing the modified Codon syntax features for maximum conciseness.
+2. Discover all 100 prompts in the markdown files in \`/workspace/codon/benchmark/\`.
+3. For every signle prompt file, write the complete implementation in a matching \`.cdn\` file in \`/workspace/codon/benchmark/\` utilizing the modified Codon syntax features for maximum conciseness.
 4. Finish immediately without executing, testing, or installing anything.`;
 
 export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/codon.
