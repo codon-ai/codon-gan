@@ -19,8 +19,8 @@ The token-efficiency of Javascript is being measured directly by the tokens you 
 - Once the benchmark implementation file is written, finish immediately.
 
 ### Steps:
-1. Discover the benchmark prompt(s) in \`/workspace/codon/benchmark/\`.
-2. For each markdown prompt file, write the complete implementation in a matching \`.js\` file.
+1. Discover all 100 benchmark prompts in the markdown files in \`/workspace/codon/benchmark/\`.
+2. For every single prompt, write the complete implementation in a matching \`.js\` file in \`/workspace/codon/benchmark/\` with maximum conciseness.
 3. Finish immediately without executing or installing anything.`;
 
 function formatStepDetail(step: any): string {

@@ -7,8 +7,8 @@ Navigate to /workspace/codon and execute the following commands in bash:
 \`\`\`bash
 cd /workspace/codon
 
-git config user.name "Keizou Wang"
-git config user.email "keizouw@proton.me"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 ${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
 
 # Identify highest finished revision rev<n>
@@ -40,8 +40,8 @@ Codon is a language based on J syntax which transpiles to Javascript. In the set
    - Navigate to \`/workspace/codon\`.
    - Configure git credentials and remote:
      \`\`\`bash
-     git config user.name "Keizou Wang"
-     git config user.email "keizouw@proton.me"
+     git config user.name "github-actions[bot]"
+     git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 ${githubToken ? `     git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}     \`\`\`
    - Check the currently checked-out git branch by running \`git branch --show-current\`.
    - This active branch follows the pattern \`rev<number>a\` (e.g., \`rev1a\`, \`rev2a\`, \`rev3a\`).
@@ -120,7 +120,7 @@ export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You a
 
 The benchmark phase just concluded. The benchmark agent consumed **${tokens !== undefined ? tokens : "<tokens>"}** output tokens implementing the benchmarks.
 
-Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine whether the revision was successful, and finalize the revision branches using the standardized script below.
+Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine whether the revision was successful, finalize the revision branches, and create a Pull Request on GitHub if the revision was successful using the standardized script below.
 
 ### Standardized Format for ATTEMPTS.md:
 1. Identify the current revision from the active branch (\`rev1a\`, \`rev2a\`, etc.).
@@ -144,8 +144,8 @@ Once \`ATTEMPTS.md\` has been updated and saved, execute the following bash scri
 
 \`\`\`bash
 cd /workspace/codon
-git config user.name "Keizou Wang"
-git config user.email "keizouw@proton.me"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 ${githubToken ? `git remote set-url origin https://x-access-token:${githubToken}@github.com/codon-ai/codon.git\n` : ""}git fetch --all
 
 CURRENT_BRANCH=$(git branch --show-current)
@@ -182,8 +182,34 @@ fi
 # 3. Push the finished revision branch to GitHub
 git push -u origin "$FINISHED_BRANCH" --force
 
+# 4. If revision is successful, create a Pull Request to main
+if grep -E "^## Revision \${NUM}a \(successful\)" ATTEMPTS.md >/dev/null 2>&1; then
+  echo "Creating Pull Request for successful revision $FINISHED_BRANCH..."
+  PR_TITLE="Revision $NUM: $CURRENT_BRANCH"
+  PR_BODY="Automated pull request for successful revision $CURRENT_BRANCH (${tokens !== undefined ? tokens : "<tokens>"} tokens)."
+  TOKEN="${githubToken || ""}"
+  [ -z "$TOKEN" ] && TOKEN="$GITHUB_TOKEN"
+  export GH_TOKEN="$TOKEN"
+
+  PR_CREATED=false
+  if command -v gh >/dev/null 2>&1; then
+    if gh pr create --repo codon-ai/codon --base main --head "$FINISHED_BRANCH" --title "$PR_TITLE" --body "$PR_BODY"; then
+      PR_CREATED=true
+    fi
+  fi
+  if [ "$PR_CREATED" = false ] && [ -n "$TOKEN" ]; then
+    PR_RESP=$(curl -s -X POST \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      https://api.github.com/repos/codon-ai/codon/pulls \
+      -d "{\"title\":\"$PR_TITLE\",\"head\":\"$FINISHED_BRANCH\",\"base\":\"main\",\"body\":\"$PR_BODY\"}")
+    echo "PR response: $PR_RESP"
+  fi
+fi
+
 echo "Branches successfully updated and pushed:"
 git branch -a
 \`\`\`
 
-Confirm that \`git branch --show-current\` outputs \`$FINISHED_BRANCH\` and that both branches are successfully pushed to origin.`;
+Confirm that \`git branch --show-current\` outputs \`$FINISHED_BRANCH\`, that both branches are successfully pushed to origin, and that a Pull Request to main is created if the revision was successful.`;
