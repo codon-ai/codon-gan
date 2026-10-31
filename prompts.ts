@@ -63,8 +63,9 @@ ${githubToken ? `     git remote set-url origin https://x-access-token:${githubT
      - If the active branch is \`rev1a\`, use \`Revision 1a\`.
      - In general, for branch \`rev<number>a\`, use \`Revision <number>a\`.
    - Add a new section at the top of \`ATTEMPTS.md\` under the header:
-     \`## Revision <number>a (successful)\`
+     \`## Revision <number>a (in progress)\`
    - Describe the revision idea, rationale, target token savings for fullstack applications, and concrete syntax changes.
+   - **CRITICAL**: DO NOT include a "- **Tokens:**" line and DO NOT fabricate or predict any token count numbers in this planning step. The token count and final success/failure status will be measured and updated strictly by the benchmarking and next-steps phases.
    - Save \`ATTEMPTS.md\` and run an intermediate commit and push to ensure your documentation is captured:
      \`\`\`bash
      CURRENT_BRANCH=$(git branch --show-current)
@@ -108,36 +109,47 @@ The token-efficiency of this Codon revision is being measured directly by the to
 - **DO NOT install any packages or dependencies** (e.g., do NOT run npm install, bun add, yarn add, apt, etc.).
 - **DO NOT execute, run, test, or verify the scripts afterwards** (e.g., do NOT run codon, node, bun, or any test runners).
 - The philosophy is simply to write the code. Do not spend time running or verifying.
-- Once you write the implementation file(s), your task is complete. Finish immediately.
+- **MANDATORY COMPLETION**: You MUST create a matching \`.cdn\` implementation file for ALL 100 prompt markdown files in \`/workspace/codon/benchmark/\`. Stopping early or implementing only a subset of files is strictly prohibited and will cause the benchmark to be rejected as failed.
 
 ### Steps:
 1. Review the active syntax optimizations outlined in \`OPTIMIZATIONS.md\` (or \`OPTIMIZED.md\`).
-2. Discover all 100 prompts in the markdown files in \`/workspace/codon/benchmark/\`.
-3. For every signle prompt file, write the complete implementation in a matching \`.cdn\` file in \`/workspace/codon/benchmark/\` utilizing the modified Codon syntax features for maximum conciseness.
-4. Finish immediately without executing, testing, or installing anything.`;
+2. Discover all 100 prompts in the markdown files in \`/workspace/codon/benchmark/*.md\`.
+3. For every single prompt file, write the complete implementation in a matching \`.cdn\` file in \`/workspace/codon/benchmark/\` utilizing the modified Codon syntax features for maximum conciseness.
+4. Verify that all 100 matching \`.cdn\` files have been generated before completing your turn.`;
 
 export const nextStepsPrompt = (tokens?: number, githubToken?: string) => `You are the next-steps agent in an iterative optimization loop on the repository at /workspace/codon.
 
 The benchmark phase just concluded. The benchmark agent consumed **${tokens !== undefined ? tokens : "<tokens>"}** output tokens implementing the benchmarks.
 
-Your task is to record the benchmark results in \`ATTEMPTS.md\`, determine whether the revision was successful, finalize the revision branches, and create a Pull Request on GitHub if the revision was successful using the standardized script below.
+Your task is to verify benchmark completeness, record the benchmark results in \`ATTEMPTS.md\`, determine whether the revision was successful, finalize the revision branches, and create a Pull Request on GitHub if the revision was successful using the standardized script below.
 
 ### Standardized Format for ATTEMPTS.md:
 1. Identify the current revision from the active branch (\`rev1a\`, \`rev2a\`, etc.).
 2. Locate the section for the current revision at the top of \`/workspace/codon/ATTEMPTS.md\`.
-3. Find the last prior successful attempt in \`ATTEMPTS.md\` (the most recent section with \`(successful)\` in its header) and read its recorded \`Tokens:\` value.
-   - If there are no prior successful attempts recorded (e.g., this is Revision 1a), treat this revision as successful.
-4. Compare the current tokens (**${tokens !== undefined ? tokens : "<tokens>"}**) against the last successful attempt's tokens:
-   - If current tokens < last successful tokens (or if this is the first revision):
-     - The revision is **successful**.
-     - Set the header line to:
-       \`## Revision <number>a (successful)\`
-   - If current tokens >= last successful tokens:
-     - The revision is **unsuccessful**.
+3. **Verify Benchmark Completeness**:
+   Check that all benchmark prompt files in \`/workspace/codon/benchmark/*.md\` have a matching non-empty \`.cdn\` file in \`/workspace/codon/benchmark/*.cdn\`.
+   - If any benchmark is missing or empty (count of non-empty .cdn files < count of .md files):
+     - The benchmark is **INCOMPLETE** and must be marked **unsuccessful**.
      - Set the header line to:
        \`## Revision <number>a (unsuccessful)\`
-5. Immediately under the header line, add the standardized token line:
-   \`- **Tokens:** ${tokens !== undefined ? tokens : "<tokens>"}\`
+     - Immediately under the header line, add:
+       \`- **Tokens:** 1000000 (incomplete benchmark)\`
+   - If and ONLY if ALL prompt files have a matching non-empty \`.cdn\` file:
+     - Find the last prior successful attempt in \`ATTEMPTS.md\` (the most recent section with \`(successful)\` in its header) and read its recorded \`Tokens:\` value.
+       - If there are no prior successful attempts recorded (e.g., this is Revision 1a), treat this revision as successful.
+     - Compare the current tokens (**${tokens !== undefined ? tokens : "<tokens>"}**) against the last successful attempt's tokens:
+       - If current tokens < last successful tokens (and tokens > 0):
+         - The revision is **successful**.
+         - Set the header line to:
+           \`## Revision <number>a (successful)\`
+         - Immediately under the header line, add the standardized token line:
+           \`- **Tokens:** ${tokens !== undefined ? tokens : "<tokens>"}\`
+       - If current tokens >= last successful tokens:
+         - The revision is **unsuccessful**.
+         - Set the header line to:
+           \`## Revision <number>a (unsuccessful)\`
+         - Immediately under the header line, add the standardized token line:
+           \`- **Tokens:** ${tokens !== undefined ? tokens : "<tokens>"}\`
 
 ### Final Git Operations:
 Once \`ATTEMPTS.md\` has been updated and saved, execute the following bash script to finalize and push both the development branch and the finished revision branch:
@@ -159,6 +171,19 @@ else
     PREV_BRANCH="origin/rev$((NUM - 1))"
   else
     PREV_BRANCH="origin/main"
+  fi
+fi
+
+# Verify benchmark completeness programmatically
+TOTAL_MD=$(find /workspace/codon/benchmark -maxdepth 1 -name "*.md" -type f | wc -l)
+TOTAL_CDN=$(find /workspace/codon/benchmark -maxdepth 1 -name "*.cdn" -type f -size +0c | wc -l)
+echo "Benchmark completeness check: $TOTAL_CDN / $TOTAL_MD non-empty .cdn files found"
+
+if [ "$TOTAL_CDN" -lt "$TOTAL_MD" ]; then
+  echo "INCOMPLETE BENCHMARK: Expected $TOTAL_MD files but found $TOTAL_CDN. Forcing revision to unsuccessful."
+  sed -i -E 's/^## Revision '"$NUM"'a \((successful|in progress|pending)\)/## Revision '"$NUM"'a (unsuccessful)/' ATTEMPTS.md
+  if grep -E "^- \*\*Tokens:\*\*" ATTEMPTS.md >/dev/null 2>&1; then
+    sed -i -E '0,/^- \*\*Tokens:\*\*.*/s/^- \*\*Tokens:\*\*.*/- **Tokens:** 1000000 (incomplete: '"$TOTAL_CDN"'\/ '"$TOTAL_MD"')/' ATTEMPTS.md
   fi
 fi
 

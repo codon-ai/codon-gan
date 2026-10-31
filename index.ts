@@ -173,7 +173,12 @@ for (let i = 1; true; i++) {
             previous_interaction_id: optimize.id,
         });
 
-        const benchmarkTokens = benchmark.usage?.total_output_tokens ?? 0;
+        const rawTokens = benchmark.usage?.total_output_tokens;
+        // Require positive token output; fallback to 1000000 (failure sentinel) if 0 or undefined
+        const benchmarkTokens = (typeof rawTokens === "number" && rawTokens > 0) ? rawTokens : 1000000;
+        if (benchmarkTokens < 1000) {
+            console.warn(`[Warning] Benchmark token count (${benchmarkTokens}) is suspiciously low for 100 prompts. Likely incomplete.`);
+        }
 
         let _nextSteps = await runStep(3, {
             agent: "antigravity-preview-09-2026",
